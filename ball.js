@@ -41,7 +41,6 @@ class Cannon{
     }
 }
 
-
 class Input{
     constructor(){
       document.addEventListener("keydown",(event)=>{
@@ -116,7 +115,7 @@ class Rock{
         else
         {ctx.fillText(this.strength,this.x-this.radius/1.3,this.y+this.radius/3);}
     }
-    update_r(){
+    update_r(ctx){
         this.x+=this.speedx;
         this.y+=this.speedy;
         this.gravityspeed += this.gravity;
@@ -136,13 +135,6 @@ class Rock{
             this.speedx=-1*this.speedx;
         }
         
-        if(this.strength<=0){
-            this.x=5000;
-            this.y=5000;
-        }
-
-        
-
 
     }
     hitBy(bullet){
@@ -181,7 +173,7 @@ var bullets = [];
 var rocks = [];
 var score = new Score(350, 30);
 
-var count=0;
+var count=-1;
 var temp_score;
 
 function updategame(){
@@ -201,7 +193,7 @@ function updategame(){
         for(var j =0; j<rocks.length;j++){
         if (rocks[j].hitBy(bullets[i])){
             rocks[j].strength-=1;
-            bullets[i].x=5100;
+            bullets.splice(i,1);
             hitby=false;
         }
     }
@@ -220,8 +212,11 @@ function updategame(){
       }
 
     for (var i = 0; i<rocks.length; i++){
-        rocks[i].update_r();
+        rocks[i].update_r(ctx);
         rocks[i].draw(ctx);
+        if(rocks[i].strength<=0){
+            rocks.splice(i,1);
+        }
     }
     
     if(count%600==0){
