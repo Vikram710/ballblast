@@ -3,7 +3,7 @@ body{
 }
 button{
     padding:15px;
-    margin:30px;
+    margin:0 0 30 30;
     border-radius: 10px;
     border:none;
 }

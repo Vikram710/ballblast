@@ -2,9 +2,15 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 canvas.width = canvas.scrollWidth;
 canvas.height = canvas.scrollHeight;
+let button1 = document.getElementById("start").addEventListener("click",play);
+let button2 = document.getElementById("pause").addEventListener("click",paused);
+let button3 = document.getElementById("restart").addEventListener("click",redo);
+document.getElementById("restart").style.visibility='hidden';
 var start=false;
 var hitby=false;
 var crash=false;
+var calls=0;
+var k=0;
 
 class Cannon{
 
@@ -92,11 +98,18 @@ class Rock{
     constructor(x,y,radius){
         this.x=x;
         this.y=y;
-        this.radius=radius;
+        if(radius<40){
+            this.radius=radius+20;
+        }
+        else{
+            this.radius=radius;
+        }
         this.speedx=2;
         this.speedy=3;
         this.gravity=0.3;
         this.strength=radius
+        this.divrad=radius/2;
+        this.call=0;
     }
     draw(ctx){
         ctx.fillStyle="green";
@@ -134,7 +147,15 @@ class Rock{
             this.x=this.radius;
             this.speedx=-1*this.speedx;
         }
-        
+        if(this.strength<=0 &&this.call==0)
+        {   
+            this.divide();
+
+        }
+        if(this.strength<=0 &&this.call==1){
+            this.x=5000;
+        }
+
 
     }
     hitBy(bullet){
@@ -150,6 +171,18 @@ class Rock{
             this.y-this.radius<cannon.y+cannon.height && this.y+this.radius>cannon.y)
             { crash=true;}
             return crash;
+    }
+
+    divide(){
+        this.call=1;
+        if(this.radius<80){
+            this.radius=this.divrad+20;
+        }
+        else{
+            this.radius=this.divrad;
+        }
+        this.strength=this.divrad;
+        this.draw(ctx);
     }
        
 
@@ -176,10 +209,14 @@ var score = new Score(350, 30);
 var count=-1;
 var temp_score;
 
-function updategame(){
-    
+function updategame(){ 
+    if(pause){
+        return;
+    }
     for(var i=0;i<rocks.length;i++){
     if(rocks[i].crashWith(cannon)){
+        document.getElementById("restart").style.visibility='visible';
+        //i used splice here 
         return;
     }
 }
@@ -193,7 +230,8 @@ function updategame(){
         for(var j =0; j<rocks.length;j++){
         if (rocks[j].hitBy(bullets[i])){
             rocks[j].strength-=1;
-            bullets.splice(i,1);
+            //i used splice here gave an error saying  property of bullets[i] isnt defined . like property x etc. 
+            bullets[i].x=1000;
             hitby=false;
         }
     }
@@ -208,19 +246,17 @@ function updategame(){
       }
 
       if(count%10==0){
-      bullets.push(new Bullet(cannon.x+(cannon.width/2),cannon.y,10));
+      bullets.push(new Bullet(cannon.x+(cannon.width/2),cannon.y,8));
       }
 
     for (var i = 0; i<rocks.length; i++){
         rocks[i].update_r(ctx);
         rocks[i].draw(ctx);
-        if(rocks[i].strength<=0){
-            rocks.splice(i,1);
-        }
+
     }
     
-    if(count%600==0){
-        rocks.push(new Rock(-50,50,50));
+    if(count%6000==0){
+        rocks.push(new Rock(-50,50,20));
     }
     
     temp_score=Math.floor(count/63);
@@ -229,4 +265,35 @@ function updategame(){
 
     setTimeout(updategame,16);
 }
-updategame();
+
+
+function paused(){
+    document.getElementById("start").innerHTML="RESUME";
+    calls-=1;
+    return pause=!pause , k=0;
+  }
+  function play(){
+    calls+=1;
+    pause=false;
+    k=k+1;
+    if (k==1){
+      document.getElementById("start").innerHTML="PLAY";
+      updategame(); 
+  
+    }
+   
+  }
+function redo(){
+    if(crash){
+    start=false;
+    hitby=false;
+    crash=false;
+    calls=0;
+    k=0;
+    bullets = [];
+    rocks = [];
+    count=-1;
+    }
+    document.getElementById("restart").style.visibility='hidden';
+    play();
+}
