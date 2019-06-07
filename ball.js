@@ -255,7 +255,7 @@ function updategame(){
 
     }
     
-    if(count%6000==0){
+    if(count%600==0){
         rocks.push(new Rock(-50,50,20));
     }
     
