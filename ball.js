@@ -11,6 +11,7 @@ var hitby=false;
 var crash=false;
 var calls=0;
 var k=0;
+var num_rocks=0;
 
 class Cannon{
 
@@ -98,6 +99,8 @@ class Rock{
     constructor(x,y,radius){
         this.x=x;
         this.y=y;
+        this.strength=radius
+        this.truerad=radius;
         if(radius<40){
             this.radius=radius+20;
         }
@@ -107,8 +110,6 @@ class Rock{
         this.speedx=2;
         this.speedy=3;
         this.gravity=0.3;
-        this.strength=radius
-        this.divrad=radius/2;
         this.call=0;
     }
     draw(ctx){
@@ -147,13 +148,10 @@ class Rock{
             this.x=this.radius;
             this.speedx=-1*this.speedx;
         }
-        if(this.strength<=0 &&this.call==0)
-        {   
-            this.divide();
-
-        }
+        
         if(this.strength<=0 &&this.call==1){
             this.x=5000;
+            
         }
 
 
@@ -173,18 +171,6 @@ class Rock{
             return crash;
     }
 
-    divide(){
-        this.call=1;
-        if(this.radius<80){
-            this.radius=this.divrad+20;
-        }
-        else{
-            this.radius=this.divrad;
-        }
-        this.strength=this.divrad;
-        this.draw(ctx);
-    }
-       
 
 }
 
@@ -205,7 +191,6 @@ var cannon = new Cannon(240,430,50,80);
 var bullets = [];
 var rocks = [];
 var score = new Score(350, 30);
-
 var count=-1;
 var temp_score;
 
@@ -214,6 +199,7 @@ function updategame(){
         return;
     }
     for(var i=0;i<rocks.length;i++){
+        
     if(rocks[i].crashWith(cannon)){
         document.getElementById("restart").style.visibility='visible';
         //i used splice here 
@@ -243,6 +229,7 @@ function updategame(){
     for ( var i = 0; i<bullets.length; i++){
         bullets[i].update_b();
         bullets[i].draw(ctx);
+
       }
 
       if(count%10==0){
@@ -250,13 +237,29 @@ function updategame(){
       }
 
     for (var i = 0; i<rocks.length; i++){
+
+        if(rocks[i].strength<=0 &&rocks[i].call==0){
+            rocks.push(new Rock(rocks[i].x+60,40,Math.floor(rocks[i].truerad/2)));
+            rocks.push(new Rock(rocks[i].x-60,40,Math.floor(rocks[i].truerad/2)));
+            rocks[i].call=1; 
+            rocks[i+2-num_rocks].call=1;
+            rocks[i+3-num_rocks].call=1;           
+        }
         rocks[i].update_r(ctx);
         rocks[i].draw(ctx);
-
     }
     
-    if(count%600==0){
-        rocks.push(new Rock(-50,50,20));
+    var min=20;
+    var max=60;
+    var rnd=Math.floor((max-min)*Math.random()+min);
+    if(count%1200==0){
+        num_rocks+=1;
+        if(Math.random()>0.5){
+        rocks.push(new Rock(520,50,rnd));
+    }
+        else{
+            rocks.push(new Rock(-50,50,rnd));
+        }
     }
     
     temp_score=Math.floor(count/63);
