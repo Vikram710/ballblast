@@ -6,12 +6,15 @@ let button1 = document.getElementById("start").addEventListener("click",play);
 let button2 = document.getElementById("pause").addEventListener("click",paused);
 let button3 = document.getElementById("restart").addEventListener("click",redo);
 document.getElementById("restart").style.visibility='hidden';
+document.getElementById("highscore").innerHTML="HIGH SCORE: "+localStorage.getItem("highscore");
 var start=false;
 var hitby=false;
 var crash=false;
 var calls=0;
 var k=0;
 var num_rocks=0;
+
+
 
 class Cannon{
 
@@ -80,6 +83,7 @@ class Bullet{
         this.x=x;
         this.y=y;
         this.radius=radius;
+        this.speed=0
     }
     draw(ctx){
         ctx.fillStyle="red";
@@ -89,7 +93,19 @@ class Bullet{
         ctx.closePath();
     }
     update_b(){
-        this.y-=5;
+        if (temp_score<20){
+            this.speed=5;
+          }
+          else if(temp_score<40){
+            this.speed=10;
+          }
+          else if(temp_score<70){
+            this.speed=13;
+          }
+          else{
+            this.speed=16;
+          }
+        this.y-=this.speed;
         
     }
 
@@ -202,7 +218,8 @@ function updategame(){
         
     if(rocks[i].crashWith(cannon)){
         document.getElementById("restart").style.visibility='visible';
-        //i used splice here 
+        //adf
+        store(temp_score);
         return;
     }
 }
@@ -275,7 +292,7 @@ function paused(){
     calls-=1;
     return pause=!pause , k=0;
   }
-  function play(){
+function play(){
     calls+=1;
     pause=false;
     k=k+1;
@@ -296,7 +313,15 @@ function redo(){
     bullets = [];
     rocks = [];
     count=-1;
+    temp_score=0;
     }
     document.getElementById("restart").style.visibility='hidden';
     play();
+  }
+function store(score){
+    if(score>localStorage.getItem("highscore")){
+        localStorage.setItem("highscore", score);
+    }
+    document.getElementById("highscore").innerHTML="HIGH SCORE: "+localStorage.getItem("highscore");
 }
+
