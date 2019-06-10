@@ -5,16 +5,26 @@ canvas.height = canvas.scrollHeight;
 let button1 = document.getElementById("start").addEventListener("click",play);
 let button2 = document.getElementById("pause").addEventListener("click",paused);
 let button3 = document.getElementById("restart").addEventListener("click",redo);
+let background = document.getElementById("back");
+let cover = document.getElementById("cover");
+let gameover = document.getElementById("gameover");
+let shooter= document.getElementById("cannon");
+let bullet = document.getElementById("bullet");
+
 document.getElementById("restart").style.visibility='hidden';
-document.getElementById("highscore").innerHTML="HIGH SCORE: "+localStorage.getItem("highscore");
+if(localStorage.getItem("highscore")==null){
+    document.getElementById("highscore").innerHTML="HIGH SCORE: "+0;
+}
+else{document.getElementById("highscore").innerHTML="HIGH SCORE: "+localStorage.getItem("highscore");}
+
+ctx.drawImage(cover,0,0,480,480);
+
 var start=false;
 var hitby=false;
 var crash=false;
 var calls=0;
 var k=0;
 var num_rocks=0;
-
-
 
 class Cannon{
 
@@ -203,7 +213,7 @@ class Score{
   }
 
 new Input();
-var cannon = new Cannon(240,430,50,80);
+var cannon = new Cannon(215,400,50,80);
 var bullets = [];
 var rocks = [];
 var score = new Score(350, 30);
@@ -218,7 +228,7 @@ function updategame(){
         
     if(rocks[i].crashWith(cannon)){
         document.getElementById("restart").style.visibility='visible';
-        //adf
+        ctx.drawImage(gameover,0,0,480,480);
         store(temp_score);
         return;
     }
@@ -226,6 +236,7 @@ function updategame(){
     
     
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(background,0,0,480,480);
     count+=1;
     start=true;
 
@@ -313,6 +324,7 @@ function redo(){
     bullets = [];
     rocks = [];
     count=-1;
+    cannon.x=215;
     temp_score=0;
     }
     document.getElementById("restart").style.visibility='hidden';
